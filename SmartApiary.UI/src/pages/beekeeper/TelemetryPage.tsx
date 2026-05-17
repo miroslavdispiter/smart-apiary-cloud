@@ -68,10 +68,19 @@ export default function TelemetryPage() {
 
     const hub = createTelemetryHubConnection();
 
-    hub.on("TelemetryReceived", (sample: TelemetrySample) => {
+    hub.on("TelemetryReceived", async (sample: TelemetrySample) => {
       if (sample.hiveId !== activeHiveId) return;
-      setLatest(sample);
-      setSamples((current) => [...current.filter((s) => s.id !== sample.id), sample].sort((a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime()));
+        setLatest(sample);
+        setSamples((current) =>
+        [...current.filter((s) => s.id !== sample.id), sample]
+        .sort((a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime())
+      );
+      try {
+        const deltaRes = await getNectarDelta(sample.hiveId, daysAgoIso(14), nowIso());
+        setDeltas(deltaRes.data);
+      } catch {
+
+      }
     });
 
     hub.on("TelemetryAlert", (alert: TelemetryAlert) => {
