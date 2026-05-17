@@ -9,6 +9,8 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+import { CULTURE_ICONS, CultureType } from "../../types/farmer";
+
 export type LatLng = { lat: number; lng: number };
 
 interface NearbyCulture {
@@ -16,7 +18,7 @@ interface NearbyCulture {
   plotName: string;
   latitude: number;
   longitude: number;
-  cultureType: number;
+  cultureType: number | string;
 }
 
 interface MapViewProps {
@@ -57,16 +59,6 @@ function MapUpdater({ position }: { position: LatLng | null }) {
   return null;
 }
 
-const cultureIcons: Record<number, string> = {
-  1: "🌻",
-  2: "🌼",
-  3: "💜",
-  4: "🍀",
-  5: "🌿",
-  6: "🌽",
-  7: "🌾",
-};
-
 export default function MapView({
   position,
   setPosition,
@@ -93,19 +85,28 @@ export default function MapView({
           <Marker position={[position.lat, position.lng]} />
         )}
 
-        {/* ✅ Nearby culture markers */}
-        {nearbyCultures.map((c) => (
-          <Marker
-            key={c.plotId}
-            position={[c.latitude, c.longitude]}
-            icon={L.divIcon({
-              html: `<div style="font-size:22px">${cultureIcons[c.cultureType] ?? "🌱"}</div>`,
-              className: "",
-            })}
-          />
-        ))}
+        {/* Nearby culture markers */}
+        {nearbyCultures.map((c) => {
+          const resolvedType =
+            typeof c.cultureType === "string"
+              ? CultureType[c.cultureType as keyof typeof CultureType]
+              : c.cultureType;
 
-        {/* ✅ Editable mode */}
+          return (
+            <Marker
+              key={c.plotId}
+              position={[c.latitude, c.longitude]}
+              icon={L.divIcon({
+                html: `<div style="font-size:22px">${
+                  CULTURE_ICONS[resolvedType] ?? "🌱"
+                }</div>`,
+                className: "",
+              })}
+            />
+          );
+        })}
+
+        {/* Editable mode */}
         {!readOnly && (
           <LocationPicker setPosition={setPosition} />
         )}
