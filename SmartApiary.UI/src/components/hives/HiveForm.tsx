@@ -4,11 +4,11 @@ import { createHive, updateHive } from "../../api/hives";
 import type { Hive } from "../../types";
 
 const HIVE_TYPE_OPTIONS = [
-  { value: 1, label: "LR" },
-  { value: 2, label: "DB" },
-  { value: 3, label: "Poloshka" },
-  { value: 4, label: "Dadant" },
-  { value: 5, label: "Other" },
+  { value: "LR", label: "LR" },
+  { value: "DB", label: "DB" },
+  { value: "Poloshka", label: "Poloshka" },
+  { value: "Dadant", label: "Dadant" },
+  { value: "Other", label: "Other" },
 ];
 
 interface HiveFormProps {
@@ -20,7 +20,7 @@ interface HiveFormProps {
 
 export default function HiveForm({ apiaryId, existing, onSuccess, onCancel }: HiveFormProps) {
   const [label, setLabel] = useState(existing?.label ?? "");
-  const [type, setType] = useState<number>(existing?.type ?? 1);
+  const [type, setType] = useState<string>(existing?.type ?? "LR");
   const [boxColor, setBoxColor] = useState(existing?.boxColor ?? "");
   const [queenAge, setQueenAge] = useState<string>(existing?.queenAge?.toString() ?? "");
   const [note, setNote] = useState(existing?.note ?? "");
@@ -66,7 +66,7 @@ export default function HiveForm({ apiaryId, existing, onSuccess, onCancel }: Hi
       <Select
         label="Hive Type *"
         value={type}
-        onChange={(e) => setType(Number(e.target.value))}
+        onChange={(e) => setType(e.target.value)}
         options={HIVE_TYPE_OPTIONS}
       />
 

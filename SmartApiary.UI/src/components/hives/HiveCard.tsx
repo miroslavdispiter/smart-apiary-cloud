@@ -11,17 +11,17 @@ interface HiveCardProps {
 }
 
 const typeVariant = (
-  type: number
+  type: string
 ): "amber" | "blue" | "green" | "purple" | "gray" => {
   const map: Record<
-    number,
+    string,
     "amber" | "blue" | "green" | "purple" | "gray"
   > = {
-    1: "amber",
-    2: "blue",
-    3: "green",
-    4: "purple",
-    5: "gray",
+    "LR": "amber",
+    "DB": "blue",
+    "Poloshka": "green",
+    "Dadant": "purple",
+    "Other": "gray",
   };
 
   return map[type] ?? "gray";

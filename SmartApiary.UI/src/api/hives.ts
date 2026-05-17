@@ -8,7 +8,7 @@ export const getHiveById = (id: string) => api.get(`/Hives/${id}`);
 export const createHive = (data: {
   apiaryId: string;
   label: string;
-  type: number;
+  type: string;
   boxColor?: string;
   queenAge?: number;
   note?: string;
@@ -18,7 +18,7 @@ export const updateHive = (
   id: string,
   data: {
     label: string;
-    type: number;
+    type: string;
     boxColor?: string;
     queenAge?: number;
     note?: string;

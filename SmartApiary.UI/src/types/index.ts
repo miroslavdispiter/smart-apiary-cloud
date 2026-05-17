@@ -20,7 +20,7 @@ export interface Hive {
   id: string;
   apiaryId: string;
   label: string;
-  type: HiveType;
+  type: string;
   boxColor?: string;
   queenAge?: number;
   note?: string;
@@ -28,22 +28,31 @@ export interface Hive {
   createdAt?: string;
 }
 
-export enum HiveType {
+/*export enum HiveType {
   Unknown = 0,
   LR = 1,
   DB = 2,
   Poloshka = 3,
   Dadant = 4,
   Other = 5,
-}
+}*/
 
-export const HIVE_TYPE_LABELS: Record<number, string> = {
+/*export const HIVE_TYPE_LABELS: Record<number, string> = {
   0: "Unknown",
   1: "LR",
   2: "DB",
   3: "Poloshka",
   4: "Dadant",
   5: "Other",
+};*/
+
+export const HIVE_TYPE_LABELS: Record<string, string> = {
+  "Unknown": "Unknown",
+  "LR": "LR",
+  "DB": "DB",
+  "Poloshka": "Poloshka",
+  "Dadant": "Dadant",
+  "Other": "Other",
 };
 
 export interface User {
