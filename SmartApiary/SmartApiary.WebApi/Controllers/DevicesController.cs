@@ -6,6 +6,7 @@ using SmartApiary.Application.Features.Devices.Commands.Registration;
 using SmartApiary.Application.Features.Telemetry.Commands;
 using SmartApiary.Application.Features.Users.Commands.Login;
 using SmartApiary.Domain.Common;
+using SmartApiary.WebApi.DTOs;
 using SmartApiary.WebApi.Extensions;
 
 namespace SmartApiary.WebApi.Controllers
@@ -47,13 +48,5 @@ namespace SmartApiary.WebApi.Controllers
 
             return result.ToActionResult();
         }
-
-        public record TelemetryRequest(
-             double WeightKg,
-            double Humidity,
-             double Temperature,
-            int BatteryPercentage,
-            DateTime RecordedAt);
-
     }
 }
