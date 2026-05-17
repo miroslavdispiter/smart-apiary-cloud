@@ -92,4 +92,65 @@ internal class EmailService(
         else
             logger.LogInformation("[EMAIL] Email sent to {Email}.", toEmail);
     }
+    public async Task SendSprayingAnnouncementAsync(
+        string email,
+        string plotName,
+        DateTime scheduledAt,
+        int durationHours,
+        string? preparation,
+        CancellationToken ct = default)
+    {
+        var prepInfo = preparation is not null
+            ? $"<br/>Preparat: <strong>{preparation}</strong>"
+            : string.Empty;
+
+        await SendEmailAsync(
+            email,
+            "⚠️ Najava prskanja u blizini vašeg pčelinjaka",
+            $"Poljoprivrednik je najavio tretiranje pesticidima u blizini vašeg pčelinjaka.<br/><br/>" +
+            $"Parcela: <strong>{plotName}</strong><br/>" +
+            $"Datum i vrijeme: <strong>{scheduledAt:dd.MM.yyyy HH:mm}</strong><br/>" +
+            $"Trajanje: <strong>{durationHours}h</strong>" +
+            $"{prepInfo}<br/><br/>" +
+            $"Molimo vas da preduzmete potrebne mjere zaštite vaših pčela.<br/>" +
+            $"Smart Apiary Tim",
+            ct);
+    }
+
+    public async Task SendSprayingCancellationAsync(
+        string email,
+        string plotName,
+        DateTime originalScheduledAt,
+        CancellationToken ct = default)
+    {
+        await SendEmailAsync(
+            email,
+            "✅ Prskanje otkazano",
+            $"Prethodno najavljeno tretiranje pesticidima je <strong>otkazano</strong>.<br/><br/>" +
+            $"Parcela: <strong>{plotName}</strong><br/>" +
+            $"Bilo zakazano za: <strong>{originalScheduledAt:dd.MM.yyyy HH:mm}</strong><br/><br/>" +
+            $"Nije potrebna nikakva akcija s vaše strane.<br/>" +
+            $"Smart Apiary Tim",
+            ct);
+    }
+
+    public async Task SendSprayingRescheduledAsync(
+        string email,
+        string plotName,
+        DateTime newScheduledAt,
+        int newDurationHours,
+        CancellationToken ct = default)
+    {
+        await SendEmailAsync(
+            email,
+            "🔄 Prskanje pomjereno",
+            $"Tretiranje pesticidima u blizini vašeg pčelinjaka je <strong>pomjereno</strong>.<br/><br/>" +
+            $"Parcela: <strong>{plotName}</strong><br/>" +
+            $"Novi datum i vrijeme: <strong>{newScheduledAt:dd.MM.yyyy HH:mm}</strong><br/>" +
+            $"Trajanje: <strong>{newDurationHours}h</strong><br/><br/>" +
+            $"Molimo ažurirajte svoje mjere zaštite.<br/>" +
+            $"Smart Apiary Tim",
+            ct);
+    }
+
 }

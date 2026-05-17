@@ -26,6 +26,8 @@ namespace SmartApiary.Infrastructure.Extensions
             services.AddScoped<IHiveRepository, HiveRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<IHiveInspectionRepository, HiveInspectionRepository>();
+            services.AddScoped<IPlotRepository, PlotRepository>();
+            services.AddScoped<ISprayingRepository, SprayingRepository>();
 
             return services;
         }

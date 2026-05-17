@@ -14,5 +14,7 @@ namespace SmartApiary.Application.Interfaces.Repositories
         Task<IReadOnlyCollection<User>> GetAllAsync(CancellationToken ct = default);
 
         Task DeleteAsync(EntityId id, CancellationToken ct = default);
+
+        Task<IReadOnlyCollection<User>> GetByIdsAsync(IEnumerable<EntityId> ids, CancellationToken ct = default);
     }
 }

@@ -22,6 +22,7 @@ export const LoginPage = () => {
       const role = res.data.role;
       if (role === "Admin") navigate("/admin/users");
       else if (role === "Beekeeper") navigate("/beekeeper/apiaries");
+      else if (role === "Farmer") navigate("/farmer/plots");
       else navigate("/login");
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password.");

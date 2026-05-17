@@ -24,7 +24,7 @@ export interface Hive {
   boxColor?: string;
   queenAge?: number;
   note?: string;
-  devicePaired?: boolean;
+  isPaired?: boolean;
   createdAt?: string;
 }
 
@@ -73,4 +73,24 @@ export interface HiveInspection {
   queenPresent: boolean;
   notes?: string;
   createdAt: string;
+}
+
+export interface UpcomingSprayingAlert {
+  scheduleId: string;
+  plotId: string;
+  plotName: string;
+  scheduledAt: string;
+  durationHours: number;
+  preparation?: string;
+}
+
+export interface NearbyCulture {
+  plotId: string;
+  plotName: string;
+  latitude: number;
+  longitude: number;
+  cultureType: number;
+  bloomingStart: string;
+  bloomingEnd: string;
+  additionalInfo?: string;
 }

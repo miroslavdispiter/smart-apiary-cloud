@@ -1,13 +1,33 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getApiaryById } from "../../api/apiaries";
+import {
+  getApiaryById,
+  getUpcomingSprayings,
+  getNearbyCultures,
+} from "../../api/apiaries";
 import { getHivesByApiary, deleteHive } from "../../api/hives";
-import type { Apiary, Hive } from "../../types";
+import { registerDevice } from "../../api/devices";
+
+import type {
+  Apiary,
+  Hive,
+  UpcomingSprayingAlert,
+  NearbyCulture,
+} from "../../types";
+
 import HiveCard from "../../components/hives/HiveCard";
 import HiveForm from "../../components/hives/HiveForm";
+
 import {
-  Button, Modal, EmptyState, Spinner, ConfirmDialog, Badge,
+  Button,
+  Modal,
+  EmptyState,
+  Spinner,
+  ConfirmDialog,
+  Badge,
+  Alert,
 } from "../../components/common/ui";
+
 import { PageLayout } from "../../components/layout/PageLayout";
 import { ToastContainer } from "../../components/common/ui";
 import { useToast } from "../../hooks/useToast";
@@ -16,54 +36,95 @@ import MapView from "../../components/map/MapView";
 export default function ApiaryDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
   const [apiary, setApiary] = useState<Apiary | null>(null);
   const [hives, setHives] = useState<Hive[]>([]);
+  const [alerts, setAlerts] = useState<UpcomingSprayingAlert[]>([]);
+  const [cultures, setCultures] = useState<NearbyCulture[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [showAddHive, setShowAddHive] = useState(false);
   const [editTarget, setEditTarget] = useState<Hive | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Hive | null>(null);
+
+  const [registerTarget, setRegisterTarget] = useState<Hive | null>(null);
+  const [serialNumber, setSerialNumber] = useState("");
+  const [registering, setRegistering] = useState(false);
+
   const { toasts, addToast, removeToast } = useToast();
 
   const loadApiary = async () => {
-    try {
-      const res = await getApiaryById(id!);
-      setApiary(res.data);
-    } catch {
-      addToast("Failed to load apiary.", "error");
-    }
+    const res = await getApiaryById(id!);
+    setApiary(res.data);
   };
 
   const loadHives = async () => {
-    try {
-      const res = await getHivesByApiary(id!);
-      setHives(res.data);
-    } catch {
-      addToast("Failed to load hives.", "error");
-    } finally {
-      setLoading(false);
-    }
+    const res = await getHivesByApiary(id!);
+    setHives(res.data);
+  };
+
+  const loadAlerts = async () => {
+    const res = await getUpcomingSprayings(id!);
+    setAlerts(res.data);
+  };
+
+  const loadCultures = async () => {
+    const res = await getNearbyCultures(id!);
+    setCultures(res.data);
   };
 
   useEffect(() => {
-    loadApiary();
-    loadHives();
+    const load = async () => {
+      try {
+        await Promise.all([
+          loadApiary(),
+          loadHives(),
+          loadAlerts(),
+          loadCultures(),
+        ]);
+      } catch {
+        addToast("Failed to load apiary details.", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, [id]);
 
   const handleDeleteHive = async (hiveId: string) => {
+    await deleteHive(hiveId);
+    addToast("Hive deleted.", "success");
+    loadHives();
+  };
+
+  const handleRegisterDevice = async () => {
     try {
-      await deleteHive(hiveId);
-      addToast("Hive deleted.", "success");
+      setRegistering(true);
+      await registerDevice(registerTarget!.id, serialNumber);
+      addToast("Device registered!", "success");
+      setRegisterTarget(null);
+      setSerialNumber("");
       loadHives();
     } catch {
-      addToast("Delete failed.", "error");
+      addToast("Registration failed.", "error");
+    } finally {
+      setRegistering(false);
     }
   };
 
+  if (loading || !apiary) {
+    return (
+      <PageLayout title="Loading...">
+        <Spinner />
+      </PageLayout>
+    );
+  }
+
   return (
-    <PageLayout title={apiary?.name}>
+    <PageLayout title={apiary.name}>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-      {/* Back + header */}
+      {/* Back */}
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate("/beekeeper/apiaries")}
@@ -73,83 +134,115 @@ export default function ApiaryDetailsPage() {
         </button>
       </div>
 
-      {apiary && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Apiary info card */}
-          <div className="lg:col-span-1 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {apiary.imageUrl ? (
-              <img
-                src={apiary.imageUrl}
-                alt={apiary.name}
-                className="w-full h-44 object-cover"
-              />
-            ) : (
-              <div className="w-full h-44 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                <span className="text-6xl opacity-30">🏡</span>
-              </div>
-            )}
-            <div className="p-5">
-              <h2 className="text-xl font-bold text-gray-800 mb-1">{apiary.name}</h2>
-              <p className="text-xs text-gray-400 mb-3">
-                📍 {apiary.latitude.toFixed(5)}, {apiary.longitude.toFixed(5)}
-              </p>
-              {apiary.description && (
-                <p className="text-sm text-gray-600 mb-3">{apiary.description}</p>
-              )}
-              <div className="flex gap-2">
-                <Badge label={`${hives.length} hives`} variant="amber" />
-                <Badge
-                  label={`${hives.filter((h) => h.devicePaired).length} IoT paired`}
-                  variant="green"
-                />
-              </div>
-              <div className="mt-4">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => navigate(`/beekeeper/apiaries/${id}/telemetry`)}
-                >
-                  Open Telemetry & Alerts
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Map */}
-          <div className="lg:col-span-2">
-            <MapView
-              position={{ lat: apiary.latitude, lng: apiary.longitude }}
-              setPosition={() => {}}
-              height="280px"
-              readOnly
+      {/* Spraying alerts */}
+      {alerts.length > 0 && (
+        <div className="mb-6 space-y-3">
+          {alerts.map((a) => (
+            <Alert
+              key={a.scheduleId}
+              variant="warning"
+              message={
+                <span>
+                  ⚠️ <strong>Upcoming spraying near your apiary!</strong>
+                  <br />
+                  Plot: <strong>{a.plotName}</strong>
+                  <br />
+                  Scheduled at:{" "}
+                  <strong>
+                    {new Date(a.scheduledAt).toLocaleString()}
+                  </strong>
+                  <br />
+                  Duration: {a.durationHours}h
+                  {a.preparation && <> · {a.preparation}</>}
+                </span> as any
+              }
             />
-          </div>
+          ))}
         </div>
       )}
 
-      {/* Hives section */}
+      {/* Apiary info */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-1 bg-white rounded-2xl border shadow-sm overflow-hidden">
+          {apiary.imageUrl ? (
+            <img
+              src={apiary.imageUrl}
+              alt={apiary.name}
+              className="w-full h-44 object-cover"
+            />
+          ) : (
+            <div className="w-full h-44 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+              <span className="text-6xl opacity-30">🏡</span>
+            </div>
+          )}
+
+          <div className="p-5">
+            <h2 className="text-xl font-bold">{apiary.name}</h2>
+            <p className="text-xs text-gray-400">
+              📍 {apiary.latitude.toFixed(5)},{" "}
+              {apiary.longitude.toFixed(5)}
+            </p>
+
+            {apiary.description && (
+              <p className="text-sm text-gray-600 mt-2">
+                {apiary.description}
+              </p>
+            )}
+
+            <div className="flex gap-2 mt-3">
+              <Badge label={`${hives.length} hives`} variant="amber" />
+              <Badge
+                label={`${hives.filter((h) => h.isPaired).length} IoT paired`}
+                variant="green"
+              />
+            </div>
+
+            <div className="mt-4">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  navigate(`/beekeeper/apiaries/${id}/telemetry`)
+                }
+              >
+                Open Telemetry & Alerts
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Map */}
+        <div className="lg:col-span-2">
+          <MapView
+            position={{
+              lat: apiary.latitude,
+              lng: apiary.longitude,
+            }}
+            nearbyCultures={cultures}
+            height="300px"
+            readOnly
+          />
+        </div>
+      </div>
+
+      {/* Hives */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Hives</h2>
-          <p className="text-gray-500 text-sm mt-0.5">{hives.length} hives in this apiary</p>
+          <h2 className="text-xl font-bold">Hives</h2>
+          <p className="text-gray-500 text-sm">
+            {hives.length} hives in this apiary
+          </p>
         </div>
-        <Button onClick={() => setShowAddHive(true)} icon={<span>+</span>}>
-          Add Hive
+        <Button onClick={() => setShowAddHive(true)}>
+          + Add Hive
         </Button>
       </div>
 
-      {loading ? (
-        <Spinner />
-      ) : hives.length === 0 ? (
+      {hives.length === 0 ? (
         <EmptyState
           icon="🍯"
           title="No hives yet"
           description="Add your first hive to start tracking this apiary."
-          action={
-            <Button onClick={() => setShowAddHive(true)} icon={<span>+</span>}>
-              Add First Hive
-            </Button>
-          }
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -159,6 +252,7 @@ export default function ApiaryDetailsPage() {
               hive={h}
               onEdit={() => setEditTarget(h)}
               onDelete={() => setDeleteTarget(h)}
+              onRegisterDevice={() => setRegisterTarget(h)}
             />
           ))}
         </div>
@@ -177,7 +271,6 @@ export default function ApiaryDetailsPage() {
             addToast("Hive added!", "success");
             loadHives();
           }}
-          onCancel={() => setShowAddHive(false)}
         />
       </Modal>
 
@@ -196,16 +289,55 @@ export default function ApiaryDetailsPage() {
               addToast("Hive updated!", "success");
               loadHives();
             }}
-            onCancel={() => setEditTarget(null)}
           />
         )}
+      </Modal>
+
+      {/* Register IoT modal */}
+      <Modal
+        open={!!registerTarget}
+        onClose={() => {
+          setRegisterTarget(null);
+          setSerialNumber("");
+        }}
+        title="Register IoT Device"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-gray-500">
+            Enter the serial number from the back of the smart scale.
+          </p>
+
+          <input
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="SA-2024-00123"
+            value={serialNumber}
+            onChange={(e) => setSerialNumber(e.target.value)}
+          />
+
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="secondary"
+              onClick={() => setRegisterTarget(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRegisterDevice}
+              disabled={registering || !serialNumber}
+            >
+              {registering ? "Registering..." : "Register"}
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Delete confirm */}
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => deleteTarget && handleDeleteHive(deleteTarget.id)}
+        onConfirm={() =>
+          deleteTarget && handleDeleteHive(deleteTarget.id)
+        }
         title="Delete Hive"
         message={`Delete hive "${deleteTarget?.label}"? This cannot be undone.`}
         confirmLabel="Delete Hive"

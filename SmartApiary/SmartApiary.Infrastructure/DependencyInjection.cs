@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
         services.Configure<EmailOptions>(configuration.GetSection(nameof(EmailOptions)));
         services.Configure<FrontendOptions>(configuration.GetSection(nameof(FrontendOptions)));
+        services.Configure<WeatherOptions>(configuration.GetSection(nameof(WeatherOptions)));
 
         var tableConn = configuration.GetValue<string>("AzureTableOptions:ConnectionString")
             ?? throw new InvalidOperationException("AzureTableOptions:ConnectionString is not configured.");

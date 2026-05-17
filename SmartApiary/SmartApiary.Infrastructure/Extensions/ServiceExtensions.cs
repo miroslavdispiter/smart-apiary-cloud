@@ -16,6 +16,7 @@ internal static class ServiceExtensions
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IImageResizer, ImageResizerService>();
+        services.AddScoped<IWeatherService, WeatherService>();
         services.AddSingleton(new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -24,6 +25,7 @@ internal static class ServiceExtensions
         services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
 
         services.AddHttpContextAccessor();
+        services.AddHttpClient("weather");
         return services;
     }
 }

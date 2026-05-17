@@ -30,4 +30,28 @@ public sealed class NoOpEmailService : IEmailService
         string htmlMessage,
         CancellationToken ct = default)
         => Task.CompletedTask;
+
+    public Task SendSprayingAnnouncementAsync(
+        string email,
+        string plotName,
+        DateTime scheduledAt,
+        int durationHours,
+        string? preparation,
+        CancellationToken ct = default)
+        => Task.CompletedTask;
+
+    public Task SendSprayingCancellationAsync(
+        string email,
+        string plotName,
+        DateTime originalScheduledAt,
+        CancellationToken ct = default)
+        => Task.CompletedTask;
+
+    public Task SendSprayingRescheduledAsync(
+        string email,
+        string plotName,
+        DateTime newScheduledAt,
+        int newDurationHours,
+        CancellationToken ct = default)
+        => Task.CompletedTask;
 }

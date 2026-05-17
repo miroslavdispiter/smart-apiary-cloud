@@ -50,8 +50,9 @@ namespace SmartApiary.WebApi.Extensions
                 ErrorType.Validation   => new BadRequestObjectResult(errorResponse),
                 ErrorType.NotFound     => new NotFoundObjectResult(errorResponse),
                 ErrorType.Unauthorized => new ObjectResult(errorResponse) { StatusCode = 401 },
+                ErrorType.Forbidden    => new ObjectResult(errorResponse) { StatusCode = 403 },
                 ErrorType.Unexpected   => new ObjectResult(errorResponse) { StatusCode = 500 },
-                _                     => new BadRequestObjectResult(errorResponse)
+                _                      => new BadRequestObjectResult(errorResponse)
             };
         }
     }

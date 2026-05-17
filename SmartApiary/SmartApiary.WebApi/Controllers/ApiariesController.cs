@@ -7,6 +7,8 @@ using SmartApiary.Application.Features.Apiaries.Commands.UpdateApiary;
 using SmartApiary.Application.Features.Apiaries.Commands.UploadApiaryImage;
 using SmartApiary.Application.Features.Apiaries.Queries.GetApiaryById;
 using SmartApiary.Application.Features.Apiaries.Queries.GetMyApiaries;
+using SmartApiary.Application.Features.Plots.Queries.GetNearbyCultures;
+using SmartApiary.Application.Features.Spraying.Queries.GetUpcomingSprayingsNearApiary;
 using SmartApiary.WebApi.DTOs;
 using SmartApiary.WebApi.Extensions;
 
@@ -17,7 +19,6 @@ namespace SmartApiary.WebApi.Controllers
     [Authorize(Roles = "Beekeeper")]
     public class ApiariesController(IMediator mediator) : ControllerBase
     {
-        // GET api/apiaries
         [HttpGet]
         public async Task<IActionResult> GetMyApiaries(CancellationToken ct)
         {
@@ -25,7 +26,6 @@ namespace SmartApiary.WebApi.Controllers
             return result.ToActionResult();
         }
 
-        // GET api/apiaries/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id, CancellationToken ct)
         {
@@ -33,7 +33,24 @@ namespace SmartApiary.WebApi.Controllers
             return result.ToActionResult();
         }
 
-        // POST api/apiaries
+        [HttpGet("{id}/upcoming-sprayings")]
+        public async Task<IActionResult> GetUpcomingSprayings(string id, CancellationToken ct)
+        {
+            var result = await mediator.Send(
+                new GetUpcomingSprayingsNearApiaryQuery(id), ct);
+
+            return result.ToActionResult();
+        }
+
+        [HttpGet("{id}/nearby-cultures")]
+        public async Task<IActionResult> GetNearbyCultures(string id, CancellationToken ct)
+        {
+            var result = await mediator.Send(
+                new GetNearbyCulturesQuery(id), ct);
+
+            return result.ToActionResult();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateApiaryCommand command, CancellationToken ct)
         {
@@ -41,23 +58,22 @@ namespace SmartApiary.WebApi.Controllers
             return result.ToActionResult();
         }
 
-        // PUT api/apiaries/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] UpdateApiaryRequest request, CancellationToken ct)
         {
             var command = new UpdateApiaryCommand
             {
-                ApiaryId    = id,
-                Name        = request.Name,
-                Latitude    = request.Latitude,
-                Longitude   = request.Longitude,
+                ApiaryId = id,
+                Name = request.Name,
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
                 Description = request.Description
             };
+
             var result = await mediator.Send(command, ct);
             return result.ToActionResult();
         }
 
-        // DELETE api/apiaries/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id, CancellationToken ct)
         {
@@ -65,7 +81,6 @@ namespace SmartApiary.WebApi.Controllers
             return result.ToActionResult();
         }
 
-        // POST api/apiaries/{id}/image
         [HttpPost("{id}/image")]
         public async Task<IActionResult> UploadImage(string id, IFormFile image, CancellationToken ct)
         {
@@ -77,8 +92,8 @@ namespace SmartApiary.WebApi.Controllers
 
             var command = new UploadApiaryImageCommand
             {
-                ApiaryId    = id,
-                ImageData   = ms.ToArray(),
+                ApiaryId = id,
+                ImageData = ms.ToArray(),
                 ContentType = image.ContentType
             };
 

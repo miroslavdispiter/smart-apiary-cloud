@@ -82,7 +82,6 @@ export default function TelemetryPage() {
     hub
       .start()
       .then(() => hub.invoke("JoinApiaryGroup", apiaryId))
-      .catch(() => addToast("SignalR connection failed. Data can still be refreshed manually.", "warning"));
 
     setConnection(hub);
 

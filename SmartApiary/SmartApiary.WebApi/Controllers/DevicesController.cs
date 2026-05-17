@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using SmartApiary.Application.Features.Devices.Commands.Registration;
@@ -21,6 +22,7 @@ namespace SmartApiary.WebApi.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(Roles = "Beekeeper")]
         public async Task<IActionResult> Register([FromBody] RegisterDeviceCommand command, CancellationToken ct)
         {
             Result result = await _mediator.Send(command, ct);

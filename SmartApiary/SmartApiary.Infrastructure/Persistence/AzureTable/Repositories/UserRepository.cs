@@ -65,4 +65,32 @@ internal class UserRepository(
             await base.DeleteAsync(user, ct);
         }
     }
+
+    public async Task<IReadOnlyCollection<User>> GetByIdsAsync(IEnumerable<EntityId> ids, CancellationToken ct = default)
+    {
+        
+        if (ids == null || !ids.Any())
+        {
+            return Array.Empty<User>();
+        }
+
+        
+        var idValues = ids.Select(id => id.Value).Distinct().ToList();
+
+        
+        var filterConditions = idValues.Select(id => $"Id eq '{id}'");
+        var filter = string.Join(" or ", filterConditions);
+
+        try
+        {
+            
+            var results = await base.QueryAsync(filter, ct);
+            return results;
+        }
+        catch (Exception ex)
+        {
+            
+            throw;
+        }
+    }
 }
