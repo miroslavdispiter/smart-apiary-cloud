@@ -74,5 +74,32 @@ namespace SmartApiary.WebApi.Controllers
             var result = await mediator.Send(new CancelSprayingCommand(plotId, scheduleId), ct);
             return result.ToActionResult();
         }
+
+
+        // GET api/spraying/history/export?plotId=&from=&to=&completedOnly=
+        [HttpGet("history/export")]
+        public async Task<IActionResult> ExportHistory(
+            [FromQuery] string? plotId,
+            [FromQuery] DateTime? from,
+            [FromQuery] DateTime? to,
+            [FromQuery] bool completedOnly,
+            CancellationToken ct)
+        {
+            var query = new ExportSprayingHistoryQuery
+            {
+                PlotId = plotId,
+                From = from,
+                To = to,
+                CompletedOnly = completedOnly
+            };
+
+            var result = await mediator.Send(query, ct);
+
+            if (result.IsFailure)
+                return result.ToActionResult();
+
+            var fileName = $"spraying_history_{DateTime.UtcNow:yyyy-MM-dd}.pdf";
+            return File(result.Value, "application/pdf", fileName);
+        }
     }
 }

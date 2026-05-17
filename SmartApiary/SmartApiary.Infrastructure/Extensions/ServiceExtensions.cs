@@ -17,6 +17,7 @@ internal static class ServiceExtensions
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IImageResizer, ImageResizerService>();
         services.AddScoped<IWeatherService, WeatherService>();
+        services.AddScoped<ISprayingPdfService, SprayingPdfService>();
         services.AddSingleton(new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
