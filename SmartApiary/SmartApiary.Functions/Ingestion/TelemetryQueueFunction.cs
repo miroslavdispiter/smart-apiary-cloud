@@ -136,7 +136,7 @@ public class TelemetryQueueFunction
                 owner.Email,
                 subject,
                 $"Hi {owner.FirstName},<br/><br/>{message}<br/><br/>Apiary: {apiary.Name}<br/>Hive: {hive.Label}<br/><br/>Smart Apiary",
-                ct);
+            ct);
         }
         catch (Exception ex)
         {

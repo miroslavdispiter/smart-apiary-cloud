@@ -15,8 +15,8 @@
     "JwtOptions:Issuer": "SmartApiary",
     "JwtOptions:Audience": "SmartApiary",
     "JwtOptions:ExpirationMinutes": "60",
-    "EmailOptions:ApiKey": "CHANGE_ME_WHEN_DEPLOYING",
-    "EmailOptions:SenderEmail": "CHANGE_ME_WHEN_DEPLOYING",
+    "EmailOptions:ApiKey": "REMOVED_SENDGRID_KEY",
+    "EmailOptions:SenderEmail": "your-verified-sender@example.com",
     "EmailOptions:SenderName": "Smart Apiary",
     "AzureSqlOptions:ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=SmartApiary;Trusted_Connection=True;Trust Server Certificate=True;",
     "AzureTableOptions:TelemetrySamplesTable": "TelemetrySamples"

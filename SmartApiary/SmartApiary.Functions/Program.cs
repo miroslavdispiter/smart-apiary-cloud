@@ -48,6 +48,6 @@ builder.Services.AddScoped<
     ITelemetryRealtimeNotifier,
     NoOpTelemetryRealtimeNotifier>();
 
-builder.Services.AddScoped<IEmailService, NoOpEmailService>();
+//builder.Services.AddScoped<IEmailService, NoOpEmailService>();
 
 builder.Build().Run();
