@@ -20,7 +20,7 @@ namespace SmartApiary.Functions.Timers
 
         [Function("SprayingCompletionTimer")]
         public async Task Run(
-            [TimerTrigger("0 */15 * * * *")] TimerInfo timerInfo,
+            [TimerTrigger("*/30 * * * * *")] TimerInfo timerInfo,
             CancellationToken ct)
         {
             _logger.LogInformation(

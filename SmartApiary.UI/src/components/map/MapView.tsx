@@ -3,6 +3,7 @@ import {
   MapContainer,
   TileLayer,
   Marker,
+  useMapEvents,
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
@@ -20,16 +21,39 @@ interface NearbyCulture {
 
 interface MapViewProps {
   position: LatLng | null;
+  setPosition?: (pos: LatLng) => void;
   nearbyCultures?: NearbyCulture[];
   height?: string;
   readOnly?: boolean;
 }
 
+function LocationPicker({
+  setPosition,
+}: {
+  setPosition?: (pos: LatLng) => void;
+}) {
+  useMapEvents({
+    click: (e) => {
+      if (setPosition) {
+        setPosition({
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+        });
+      }
+    },
+  });
+  return null;
+}
+
 function MapUpdater({ position }: { position: LatLng | null }) {
   const map = useMap();
+
   useEffect(() => {
-    if (position) map.setView([position.lat, position.lng], 13);
-  }, [position]);
+    if (position) {
+      map.setView([position.lat, position.lng], 14);
+    }
+  }, [position, map]);
+
   return null;
 }
 
@@ -45,16 +69,18 @@ const cultureIcons: Record<number, string> = {
 
 export default function MapView({
   position,
+  setPosition,
   nearbyCultures = [],
   height = "260px",
+  readOnly = false,
 }: MapViewProps) {
   return (
-    <div className="rounded-xl overflow-hidden border shadow-sm">
+    <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
       <MapContainer
         center={
           position ? [position.lat, position.lng] : [44.8, 20.5]
         }
-        zoom={13}
+        zoom={position ? 13 : 7}
         style={{ height, width: "100%" }}
       >
         <TileLayer
@@ -62,23 +88,36 @@ export default function MapView({
           attribution="© OpenStreetMap"
         />
 
+        {/* ✅ Apiary / Plot marker */}
         {position && (
           <Marker position={[position.lat, position.lng]} />
         )}
 
+        {/* ✅ Nearby culture markers */}
         {nearbyCultures.map((c) => (
           <Marker
             key={c.plotId}
             position={[c.latitude, c.longitude]}
             icon={L.divIcon({
-              html: `<div style="font-size:24px">${cultureIcons[c.cultureType] ?? "🌱"}</div>`,
+              html: `<div style="font-size:22px">${cultureIcons[c.cultureType] ?? "🌱"}</div>`,
               className: "",
             })}
           />
         ))}
 
+        {/* ✅ Editable mode */}
+        {!readOnly && (
+          <LocationPicker setPosition={setPosition} />
+        )}
+
         <MapUpdater position={position} />
       </MapContainer>
+
+      {!readOnly && (
+        <p className="text-xs text-gray-400 text-center py-1.5 bg-gray-50 border-t border-gray-100">
+          Click on the map to set location
+        </p>
+      )}
     </div>
   );
 }
