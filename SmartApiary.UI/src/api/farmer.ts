@@ -48,3 +48,14 @@ export const getSprayingHistory = (params?: {
   to?: string;
   completedOnly?: boolean;
 }) => api.get("/Spraying/history", { params });
+
+export const exportSprayingHistory = (params?: {
+    plotId?: string;
+    from?: string;
+    to?: string;
+    completedOnly?: boolean;
+}) =>
+    api.get("/Spraying/history/export", {
+        params,
+        responseType: "blob",
+    });
