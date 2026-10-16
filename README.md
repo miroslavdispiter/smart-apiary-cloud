@@ -13,6 +13,7 @@ A cloud platform that connects beekeepers and farmers. Beekeepers manage their a
 - [Installation](#installation)
 - [Usage](#usage)
 - [Configuration](#configuration)
+- [Post-project improvements](#post-project-improvements)
 - [Team](#team)
 - [Contact](#contact)
 
@@ -219,7 +220,13 @@ The queue `telemetry-queue` and the container `apiary-images` are created automa
 
 ### 5. Fill in the configuration
 
-Set your own values in `SmartApiary/SmartApiary.WebApi/appsettings.json` and `SmartApiary/SmartApiary.Functions/local.settings.json` as described in the [Configuration](#configuration) section.
+Create the Functions settings file from the example:
+
+```powershell
+Copy-Item SmartApiary\SmartApiary.Functions\local.settings.example.json SmartApiary\SmartApiary.Functions\local.settings.json
+```
+
+The committed files contain only placeholders. Real keys go into `local.settings.json` (Functions) and `appsettings.Development.json` (Web API), which are ignored by git. See the [Configuration](#configuration) section.
 
 ### 6. Trust the development HTTPS certificate
 
@@ -332,7 +339,7 @@ Once Azurite, the Functions, the Web API and the frontend are running, open `htt
 > - Without `EmailOptions:ApiKey` the application works, only the emails are not sent.
 > - Without a valid `WeatherOptions:ApiKey` the weather check is skipped and every spraying is allowed.
 > - `UseDevelopmentStorage=true` points to Azurite. For Azure, replace it with the connection string of a Storage account.
-> - Do not commit real API keys. For local development prefer `dotnet user-secrets` for the Web API.
+> - Real keys go only into files ignored by git: `appsettings.Development.json` for the Web API (it overrides `appsettings.json` when running locally) and `local.settings.json` for the Functions. The committed `appsettings.json` and `local.settings.example.json` contain only placeholders.
 
 ### Web API
 
@@ -371,9 +378,21 @@ Once Azurite, the Functions, the Web API and the frontend are running, open `htt
 }
 ```
 
+To use real keys locally, create `SmartApiary/SmartApiary.WebApi/appsettings.Development.json` with only the values you want to override:
+
+```json
+{
+  "EmailOptions": {
+    "ApiKey": "SG.your-real-key",
+    "SenderEmail": "you@example.com"
+  },
+  "WeatherOptions": { "ApiKey": "your-real-openweathermap-key" }
+}
+```
+
 ### Azure Functions
 
-`SmartApiary/SmartApiary.Functions/local.settings.json`
+`SmartApiary/SmartApiary.Functions/local.settings.json` (copied from `local.settings.example.json`)
 
 ```json
 {
@@ -410,6 +429,14 @@ The addresses are currently set in the code:
 | `Simulator/Simulator/Simulator.cs`        | `http://localhost:5062/api/devices/telemetry`     |
 
 Alert thresholds (10 kg, 15%) and the notification radius (5 km) are constants in the code.
+
+## Post-project improvements
+
+After the team project was finished, I continued working on the code on my own. Done so far:
+
+- Removed API keys from the configuration and from the git history; real keys now live only in git-ignored local settings, with example files in the repository
+- Normalized line endings with `.gitattributes`
+- Added this README in English and Serbian
 
 ## Team
 

@@ -3,8 +3,8 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-# TAJNI FAJLOVI - odkomentarisati kada se dodaju pravi Azure kljucevi
-# local.settings.json
+# Local secrets (copy the *.example.json files and fill them in)
+local.settings.json
 
 appsettings.Development.json
 

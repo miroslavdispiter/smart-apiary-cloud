@@ -13,6 +13,7 @@ Cloud platforma koja povezuje pčelare i poljoprivrednike. Pčelari vode svoje p
 - [Instalacija](#instalacija)
 - [Korišćenje](#korišćenje)
 - [Konfiguracija](#konfiguracija)
+- [Unapređenja posle projekta](#unapređenja-posle-projekta)
 - [Tim](#tim)
 - [Kontakt](#kontakt)
 
@@ -219,7 +220,13 @@ Red `telemetry-queue` i kontejner `apiary-images` se prave automatski, ali **tab
 
 ### 5. Popuni konfiguraciju
 
-Upiši svoje vrednosti u `SmartApiary/SmartApiary.WebApi/appsettings.json` i `SmartApiary/SmartApiary.Functions/local.settings.json`, kako je opisano u odeljku [Konfiguracija](#konfiguracija).
+Napravi fajl sa podešavanjima za Functions od primera:
+
+```powershell
+Copy-Item SmartApiary\SmartApiary.Functions\local.settings.example.json SmartApiary\SmartApiary.Functions\local.settings.json
+```
+
+Commit-ovani fajlovi sadrže samo placeholdere. Pravi ključevi idu u `local.settings.json` (Functions) i `appsettings.Development.json` (Web API), koje git ignoriše. Vidi odeljak [Konfiguracija](#konfiguracija).
 
 ### 6. Odobri razvojni HTTPS sertifikat
 
@@ -332,7 +339,7 @@ Kada rade Azurite, Functions, Web API i frontend, otvori `http://localhost:5173`
 > - Bez `EmailOptions:ApiKey` aplikacija radi, samo se mejlovi ne šalju.
 > - Bez ispravnog `WeatherOptions:ApiKey` provera vremena se preskače i svako prskanje je dozvoljeno.
 > - `UseDevelopmentStorage=true` pokazuje na Azurite. Za Azure ga zameni connection string-om Storage naloga.
-> - Ne commit-uj prave API ključeve. Za lokalni razvoj Web API-ja bolje je koristiti `dotnet user-secrets`.
+> - Pravi ključevi idu samo u fajlove koje git ignoriše: `appsettings.Development.json` za Web API (pri lokalnom pokretanju menja vrednosti iz `appsettings.json`) i `local.settings.json` za Functions. Commit-ovani `appsettings.json` i `local.settings.example.json` sadrže samo placeholdere.
 
 ### Web API
 
@@ -371,9 +378,21 @@ Kada rade Azurite, Functions, Web API i frontend, otvori `http://localhost:5173`
 }
 ```
 
+Za prave ključeve lokalno napravi `SmartApiary/SmartApiary.WebApi/appsettings.Development.json` samo sa vrednostima koje menjaš:
+
+```json
+{
+  "EmailOptions": {
+    "ApiKey": "SG.tvoj-pravi-kljuc",
+    "SenderEmail": "ti@example.com"
+  },
+  "WeatherOptions": { "ApiKey": "tvoj-pravi-openweathermap-kljuc" }
+}
+```
+
 ### Azure Functions
 
-`SmartApiary/SmartApiary.Functions/local.settings.json`
+`SmartApiary/SmartApiary.Functions/local.settings.json` (kopiran iz `local.settings.example.json`)
 
 ```json
 {
@@ -410,6 +429,14 @@ Adrese su trenutno upisane u kodu:
 | `Simulator/Simulator/Simulator.cs`        | `http://localhost:5062/api/devices/telemetry`     |
 
 Pragovi za upozorenja (10 kg, 15%) i radijus obaveštavanja (5 km) su konstante u kodu.
+
+## Unapređenja posle projekta
+
+Posle završetka timskog projekta nastavio sam samostalno da radim na kodu. Do sada je urađeno:
+
+- Uklonjeni API ključevi iz konfiguracije i iz git istorije; pravi ključevi su sada samo u lokalnim podešavanjima koja git ignoriše, a u repozitorijumu su fajlovi sa primerima
+- Ujednačeni završeci redova preko `.gitattributes`
+- Dodat ovaj README na engleskom i srpskom
 
 ## Tim
 

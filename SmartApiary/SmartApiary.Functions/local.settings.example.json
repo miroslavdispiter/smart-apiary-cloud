@@ -1,5 +1,4 @@
 {
-  "_comment": "OVO SE NE COMMITUJE kada se dodaju pravi Azure kljucevi. Za sada sadrzi samo lokalne Azurite vrijednosti.",
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
@@ -11,11 +10,11 @@
     "AzureQueueOptions:ConnectionString": "UseDevelopmentStorage=true",
     "AzureQueueOptions:TelemetryQueue": "telemetry-queue",
     "AzureQueueOptions:AlertQueue": "alert-queue",
-    "JwtOptions:Secret": "CHANGE_ME_WHEN_DEPLOYING",
+    "JwtOptions:Secret": "change-me-local-dev-secret-at-least-32-characters",
     "JwtOptions:Issuer": "SmartApiary",
     "JwtOptions:Audience": "SmartApiary",
     "JwtOptions:ExpirationMinutes": "60",
-    "EmailOptions:ApiKey": "REMOVED_SENDGRID_KEY",
+    "EmailOptions:ApiKey": "your-sendgrid-api-key",
     "EmailOptions:SenderEmail": "your-verified-sender@example.com",
     "EmailOptions:SenderName": "Smart Apiary",
     "AzureSqlOptions:ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=SmartApiary;Trusted_Connection=True;Trust Server Certificate=True;",
